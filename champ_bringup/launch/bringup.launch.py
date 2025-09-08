@@ -4,6 +4,7 @@ import launch_ros
 import xml.etree.ElementTree as ET
 from ament_index_python.packages import get_package_share_directory
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 
 from launch import LaunchDescription
 from launch.actions import (
@@ -23,8 +24,8 @@ from launch.substitutions import Command, LaunchConfiguration
 def generate_launch_description():
 
     config_pkg_share = launch_ros.substitutions.FindPackageShare(
-        package="champ_config"
-    ).find("champ_config")
+        package="lite3_champ_config"
+    ).find("lite3_champ_config")
     descr_pkg_share = launch_ros.substitutions.FindPackageShare(
         package="champ_description"
     ).find("champ_description")
@@ -111,7 +112,9 @@ def generate_launch_description():
         default_value="false",
         description="Whether hardware is connected",
     )
-
+    # descr_pkg_share = launch_ros.substitutions.FindPackageShare(
+    #     package="champ_description"
+    # ).find("champ_description")
     declare_publish_joint_control = DeclareLaunchArgument(
         "publish_joint_control",
         default_value="true",
@@ -165,7 +168,7 @@ def generate_launch_description():
             {"publish_joint_control": LaunchConfiguration("publish_joint_control")},
             {"publish_foot_contacts": LaunchConfiguration("publish_foot_contacts")},
             {"joint_controller_topic": LaunchConfiguration("joint_controller_topic")},
-            {"urdf": Command(['xacro ', LaunchConfiguration('description_path')])},
+            {"urdf": ParameterValue(Command(['xacro ', LaunchConfiguration('description_path')]), value_type=str)},
             LaunchConfiguration('joints_map_path'),
             LaunchConfiguration('links_map_path'),
             LaunchConfiguration('gait_config_path'),
@@ -180,48 +183,48 @@ def generate_launch_description():
         parameters=[
             {"use_sim_time": LaunchConfiguration("use_sim_time")},
             {"orientation_from_imu": LaunchConfiguration("orientation_from_imu")},
-            {"urdf": Command(['xacro ', LaunchConfiguration('description_path')])},
+            {"urdf": ParameterValue(Command(['xacro ', LaunchConfiguration('description_path')]), value_type=str)},
             LaunchConfiguration('joints_map_path'),
             LaunchConfiguration('links_map_path'),
             LaunchConfiguration('gait_config_path'),
         ],
     )
 
-    base_to_footprint_ekf = Node(
-        package="robot_localization",
-        executable="ekf_node",
-        name="base_to_footprint_ekf",
-        output="screen",
-        parameters=[
-            {"base_link_frame": LaunchConfiguration("base_link_frame")},
-            {"use_sim_time": LaunchConfiguration("use_sim_time")},
-            os.path.join(
-                get_package_share_directory("champ_base"),
-                "config",
-                "ekf",
-                "base_to_footprint.yaml",
-            ),
-        ],
-        remappings=[("odometry/filtered", "odom/local")],
-    )
+    # base_to_footprint_ekf = Node(
+    #     package="robot_localization",
+    #     executable="ekf_node",
+    #     name="base_to_footprint_ekf",
+    #     output="screen",
+    #     parameters=[
+    #         {"base_link_frame": LaunchConfiguration("base_link_frame")},
+    #         {"use_sim_time": LaunchConfiguration("use_sim_time")},
+    #         os.path.join(
+    #             get_package_share_directory("champ_base"),
+    #             "config",
+    #             "ekf",
+    #             "base_to_footprint.yaml",
+    #         ),
+    #     ],
+    #     remappings=[("odometry/filtered", "odom/local")],
+    # )
 
-    footprint_to_odom_ekf = Node(
-        package="robot_localization",
-        executable="ekf_node",
-        name="footprint_to_odom_ekf",
-        output="screen",
-        parameters=[
-            {"base_link_frame": LaunchConfiguration("base_link_frame")},
-            {"use_sim_time": LaunchConfiguration("use_sim_time")},
-            os.path.join(
-                get_package_share_directory("champ_base"),
-                "config",
-                "ekf",
-                "footprint_to_odom.yaml",
-            ),
-        ],
-        remappings=[("odometry/filtered", "odom")],
-    )
+    # footprint_to_odom_ekf = Node(
+    #     package="robot_localization",
+    #     executable="ekf_node",
+    #     name="footprint_to_odom_ekf",
+    #     output="screen",
+    #     parameters=[
+    #         {"base_link_frame": LaunchConfiguration("base_link_frame")},
+    #         {"use_sim_time": LaunchConfiguration("use_sim_time")},
+    #         os.path.join(
+    #             get_package_share_directory("champ_base"),
+    #             "config",
+    #             "ekf",
+    #             "footprint_to_odom.yaml",
+    #         ),
+    #     ],
+    #     remappings=[("odometry/filtered", "odom")],
+    # )
 
     rviz2 = Node(
         package='rviz2',
@@ -258,8 +261,8 @@ def generate_launch_description():
             description_ld,
             quadruped_controller_node,
             state_estimator_node,
-            base_to_footprint_ekf,
-            footprint_to_odom_ekf,
+            # base_to_footprint_ekf,
+            # footprint_to_odom_ekf,
             rviz2
         ]
     )
