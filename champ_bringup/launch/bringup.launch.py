@@ -245,7 +245,7 @@ def generate_launch_description():
             declare_publish_odom_tf,
             declare_close_loop_odom,
             quadruped_controller_node,
-            state_estimator_node,
+            #state_estimator_node, #commented out by Lenka to simplify Sim nodes; this will need to be commented out when we stop using odom from Gazebo
             # base_to_footprint_ekf,
             # footprint_to_odom_ekf,
             rviz2
