@@ -143,6 +143,12 @@ def generate_launch_description():
         "close_loop_odom", default_value="false", description=""
     )
 
+    declare_publish_robot_description = DeclareLaunchArgument(
+        "publish_robot_description",
+        default_value="true",
+        description="Launch robot_state_publisher (set false if already running)",
+    )
+
     description_ld = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -155,6 +161,7 @@ def generate_launch_description():
             "use_sim_time": LaunchConfiguration("use_sim_time"),
             "description_path": LaunchConfiguration("description_path"),
         }.items(),
+        condition=IfCondition(LaunchConfiguration("publish_robot_description")),
     )
 
     quadruped_controller_node = Node(
@@ -258,6 +265,7 @@ def generate_launch_description():
             declare_publish_foot_contacts,
             declare_publish_odom_tf,
             declare_close_loop_odom,
+            declare_publish_robot_description,
             description_ld,
             quadruped_controller_node,
             state_estimator_node,
